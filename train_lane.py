@@ -11,8 +11,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 import numpy as np
-from data_helper import UnlabeledDataset, LabeledDataset
-from helper import collate_fn
+from helper import collate_fn, compute_ts_road_map
 from torchvision import transforms
 
 from model_lane import Multi_UNet
@@ -22,6 +21,7 @@ import cv2
 import kornia
 
 torch.manual_seed(0)
+print('hi')
 
 ### Hard-coded Homography transform matrices
 # 6 x 3 x 3: order same as camera CAM_FRONT_LEFT, CAM_FRONT, CAM_FRONT_RIGHT, CAM_BACK_LEFT, CAM_BACK, 􏰀CAM_BACK_RIGHT
@@ -70,10 +70,10 @@ for epoch in range(20):
 	    loss = criterion(pred,torch.stack(road_image).long())
 	    loss.backward()
 	    optimizer.step()
-	    if i % 100 == 0:
+	    if i % 10 == 0:
 	        print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
 	            epoch, i, len(train_loader),
-	            100. * i / len(train_loader), loss.item()))
+	            10 * i / len(train_loader), loss.item()))
 
 	#Validation
 	model.eval()
@@ -85,11 +85,11 @@ for epoch in range(20):
 	        sample, target, road_image = data
 	        pred = model(sample, M_matrices)
 	        predicted_road_map = pred.data.max(1)[1] # get the index of the max log-probability       
-	        ts_road_map = compute_ts_road_map(predicted_road_map, road_image)
+	        ts_road_map = compute_ts_road_map(predicted_road_map, torch.stack(road_image).long())
 	        total_ts_road_map += ts_road_map
 
-	        if opt.verbose:
-	            print(f'{i} - Road Map Score: {ts_road_map:.4}')
+	        #if opt.verbose:
+	        print(f'{i} - Road Map Score: {ts_road_map:.4}')
 
 	print(f'Road Map Score: {total_ts_road_map / total:.4}')
 	    
