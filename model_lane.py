@@ -46,12 +46,13 @@ class Multi_UNet(nn.Module):
         super(Multi_UNet, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down(64, 128)
-        self.down2 = down(128, 256)
-        self.down3 = down(256, 512)
-        self.down4 = down(512, 512)
-        self.up1 = up(512, 256)
-        self.up2 = up(256, 128)
-        self.up3 = up(128, 64)
+        self.down2 = down(128,256)
+        self.down3 = down(256,256)
+        # self.down3 = down(256, 512)
+        # self.down4 = down(512, 512)
+        #self.up1 = up(512, 256)
+        self.up1 = up(256, 128)
+        self.up2 = up(128, 64)
         self.up_map = nn.UpsamplingBilinear2d((800,800))
         self.outc = outconv(64, n_classes)
 
@@ -67,15 +68,15 @@ class Multi_UNet(nn.Module):
             x2 = self.down1(x1)
             x3 = self.down2(x2)
             x4 = self.down3(x3)
-            x5 = self.down4(x4)
-            data.append(x5.unsqueeze(0))
+            #x5 = self.down4(x4)
+            data.append(x4.unsqueeze(0))
         data = torch.cat(data, dim=0)
         #max pool feature maps from multi-view. 
         agg = torch.max(data,dim=0)[0] #get the max values among 6 views, shape: [batch_size, 512, 16, 19]
         #interpolate up
         x = self.up1(agg)
         x = self.up2(x)
-        x = self.up3(x)
+        #x = self.up3(x)
         x = self.up_map(x)  #last one to match output 800x800
         x = self.outc(x)
         return x 
