@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import torchvision
 from math import ceil
-import cv2
+#import cv2
 import kornia
 
 ### Hard-coded Homography transform matrices
@@ -60,7 +60,7 @@ class Multi_UNet(nn.Module):
         #use shared weights CNN for 6 views
         for i in range(6):
             #get a batch of *same* view images
-            img_batch = torch.stack(x)[:,i,:,:,:]
+            img_batch = x[:,i,:,:,:]#torch.stack(x)[:,i,:,:,:]
             #perform BEV transform: M - (batch_size, 3, 3)
             img_warp = kornia.warp_perspective(img_batch, M_matrices[i].unsqueeze(0).repeat(len(x), 1,1), dsize=(219, 306))
             x1 = self.inc(img_warp)
