@@ -42,8 +42,9 @@ M_matrices = torch.tensor([
 #print(M_matrices.shape)
 
 class Multi_UNet(nn.Module):
-    def __init__(self, n_channels, n_classes):
+    def __init__(self, n_channels, n_classes, BEV=True, Bilinear=True):
         super(Multi_UNet, self).__init__()
+        self.BEV = BEV
         self.inc = inconv(n_channels, 64)
         self.down1 = down(64, 128)
         self.down2 = down(128,256)
@@ -51,8 +52,8 @@ class Multi_UNet(nn.Module):
         # self.down3 = down(256, 512)
         # self.down4 = down(512, 512)
         #self.up1 = up(512, 256)
-        self.up1 = up(256, 128)
-        self.up2 = up(128, 64)
+        self.up1 = up(256, 128, bilinear=Bilinear)
+        self.up2 = up(128, 64,bilinear=Bilinear)
         self.up_map = nn.UpsamplingBilinear2d((800,800))
         self.outc = outconv(64, n_classes)
 
@@ -62,9 +63,11 @@ class Multi_UNet(nn.Module):
         for i in range(6):
             #get a batch of *same* view images
             img_batch = x[:,i,:,:,:]#torch.stack(x)[:,i,:,:,:]
-            #perform BEV transform: M - (batch_size, 3, 3)
-            img_warp = kornia.warp_perspective(img_batch, M_matrices[i].unsqueeze(0).repeat(len(x), 1,1), dsize=(219, 306))
-            x1 = self.inc(img_warp)
+            if self.BEV:            #perform BEV transform: M - (batch_size, 3, 3)
+                img_warp = kornia.warp_perspective(img_batch, M_matrices[i].unsqueeze(0).repeat(len(x), 1,1), dsize=(219, 306))
+                x1 = self.inc(img_warp)
+            else:
+                x1 = self.inc(img_batch)
             x2 = self.down1(x1)
             x3 = self.down2(x2)
             x4 = self.down3(x3)
