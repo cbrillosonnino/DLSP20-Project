@@ -76,8 +76,8 @@ def main(args):
 	#load data
 	train_loader, val_loader = get_loaders('labeled', batch_size = args.batch_size)
 	# initialize model
-	model = Multi_UNet(n_channels=3, n_classes=2)
-	model = nn.DataParallel(model, args.gpu_ids)
+	model = Multi_UNet(n_channels=3, n_classes=2, BEV=args.use_BEV, Bilinear=args.use_Bilinear)
+	#model = nn.DataParallel(model, args.gpu_ids)
 	model.to(device)  
 	optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-4, betas=(0.9, 0.999))
 	criterion = nn.CrossEntropyLoss() #binary classification (combined softmax + NLL)
@@ -154,6 +154,10 @@ if __name__ == '__main__':
                         help='initial learning rate')
     parser.add_argument('--batch_size', type=int, default=16, 
                         help='batch size')
+    parser.add_argument('--use_BEV', action='store_true',
+                        help='use BEV transformed images')
+    parser.add_argument('--use_Bilinear',action='store_true',
+                        help='use fixed bilinear upsampling or learned weights')
     parser.add_argument('--cuda', action='store_true',
                         help='use CUDA')
     parser.add_argument('--log-interval', type=int, default=200, metavar='N',
