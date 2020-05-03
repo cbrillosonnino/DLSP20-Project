@@ -70,8 +70,8 @@ def main(args):
 	       [-1.59872116e-14, -1.66551463e+00,  2.34087152e+02],
 	       [-8.30498864e-17, -7.61006318e-03,  1.00000000e+00]]
 	       ])
-
-	M_matrices.to(device)
+	M_matrices = M_matrices.cuda()
+	print('M on cuda?',M_matrices.is_cuda)
 
 	#load data
 	train_loader, val_loader = get_loaders('labeled', batch_size = args.batch_size)
