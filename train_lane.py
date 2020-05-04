@@ -79,7 +79,7 @@ def main(args):
 	model = Multi_UNet(n_channels=3, n_classes=2, BEV=args.use_BEV, Bilinear=args.use_Bilinear)
 	#model = nn.DataParallel(model, args.gpu_ids)
 	model.to(device)  
-	optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-4, betas=(0.9, 0.999))
+	optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4, betas=(0.9, 0.999)) 
 	criterion = nn.CrossEntropyLoss() #binary classification (combined softmax + NLL)
 
 	# Get saver
@@ -92,6 +92,11 @@ def main(args):
 	log.info('Training...')
 	for epoch in range(args.num_epochs):
 		log.info(f'Starting epoch {epoch}...')
+		if epoch+1 % 10 == 0:
+		    learning_rate /= 10 #lr decay
+		    for param_group in optimizer.param_groups: param_group['lr'] = learning_rate
+		    log.info(f'Lr decay /10 {epoch}...')
+
 		model.train()
 		with torch.enable_grad(), \
                 tqdm(total=len(train_loader.dataset)) as progress_bar:
@@ -126,18 +131,20 @@ def main(args):
 		with torch.no_grad(), \
             tqdm(total=len(val_loader.dataset)) as progress_bar:
 		    for i, data in enumerate(val_loader):
-		        total += 1
 		        sample, target, road_image = data
+		        total += 1
 		        sample = torch.stack(sample).to(device)
 		        road_image = torch.stack(road_image).long().to(device)
 		        pred = model(sample, M_matrices)
 		        predicted_road_map = pred.data.max(1)[1] # get the index of the max log-probability       
 		        ts_road_map = compute_ts_road_map(predicted_road_map, road_image)
+		        print(f'{i} - Road Map Score: {ts_road_map:.4}')		
 		        total_ts_road_map += ts_road_map
 
 		        #if opt.verbose:
-		        #print(f'{i} - Road Map Score: {ts_road_map:.4}')		
 		print(f'Road Map Score: {total_ts_road_map / total:.4}')
+		log.info(f'Road Map Score {total_ts_road_map / total:.4}...')
+
 		#save model checkpoint: step, model, metric_val, device
 		saver.save(epoch, model, total_ts_road_map/total, device)
 
