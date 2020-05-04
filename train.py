@@ -35,8 +35,8 @@ def get_parser():
 
 def main():
 
-    cudnn.benchmark = True
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    cudnn.benchmark = True
 
     args = get_parser().parse_args()
 
@@ -46,7 +46,7 @@ def main():
 
     trainloader, valloader = get_loaders('labeled', batch_size = args.batch_size)
 
-    model = Yolo(args.feature_size, args.num_bboxes).to(device)
+    model = Yolo(args.feature_size, args.num_bboxes, device).to(device)
     loss_fxn = Loss(args.feature_size, args.num_bboxes)
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -107,7 +107,7 @@ def main():
         file = open(f'{args.save}/resuts.txt','a')
         file.write('{},{}\n'.format(train_losses.avg,val_loss))
         file.close()
-        
+
         save_checkpoint({
             'epoch': epoch + 1, 'model': model.state_dict(),
             'min_val_loss': min_val_loss, 'optimizer' : optimizer.state_dict(),
@@ -213,7 +213,7 @@ class DarkNet(nn.Module):
         return out
 
 class Yolo(nn.Module):
-    def __init__(self, feature_size, num_bboxes):
+    def __init__(self, feature_size, num_bboxes, device):
         super().__init__()
 
         self.M_matrices = torch.tensor([
@@ -266,7 +266,7 @@ class Yolo(nn.Module):
         batch_size = images.shape[0]
 
         for i in range(6):
-            img_warp = kornia.warp_perspective(img_batch[:,i,:,:,:], self.M_matrices[i].unsqueeze(0).repeat(len(images), 1,1), dsize=(204, 306))
+            img_warp = kornia.warp_perspective(images[:,i,:,:,:], self.M_matrices[i].unsqueeze(0).repeat(batch_size, 1,1), dsize=(204, 306))
             img_warp = kornia.center_crop(img_warp, (192,288))
             out = self.darknet(img_warp)
             out = out.view(batch_size,1024,-1)
