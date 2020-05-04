@@ -10,19 +10,18 @@ from math import ceil
 import kornia
 
 
-###Unet: single view
 class UNet_features(nn.Module):
-    def __init__(self, n_channels):
+    def __init__(self, n_channels,Bilinear):
         super(UNet_features, self).__init__()
         self.inc = inconv(n_channels, 64)
         self.down1 = down(64, 128)
         self.down2 = down(128, 256)
         self.down3 = down(256, 512)
         self.down4 = down(512, 512)
-        self.up1 = up(1024, 256,bilinear=False)
-        self.up2 = up(512, 128, bilinear=False)
-        self.up3 = up(256, 64, bilinear=False)
-        self.up4 = up(128, 64, bilinear=False)
+        self.up1 = up(1024, 256,bilinear=Bilinear)
+        self.up2 = up(512, 128, bilinear=Bilinear)
+        self.up3 = up(256, 64, bilinear=Bilinear)
+        self.up4 = up(128, 64, bilinear=Bilinear)
         self.up_map = nn.UpsamplingBilinear2d((800,800))
         #self.outc = outconv(64, n_classes)
 
@@ -54,9 +53,10 @@ class UNet_classifier(nn.Module):
 
 ###Unet:Multi-view
 class Multi_UNet(nn.Module):
-    def __init__(self, n_channels, n_classes):
+    def __init__(self, n_channels, n_classes, BEV=True, Bilinear=True):
         super(Multi_UNet, self).__init__()
-        self.net1 = UNet_features(n_channels)
+        self.BEV = BEV
+        self.net1 = UNet_features(n_channels,Bilinear)
         self.net2 = UNet_classifier(n_classes)
 
     def forward(self, x, M_matrices):
@@ -65,9 +65,11 @@ class Multi_UNet(nn.Module):
         for i in range(6):
             #get a batch of same view images
             img_batch = x[:,i,:,:,:] #torch.stack(x)[:,i,:,:,:]
-            #perform BEV transform:
-            img_warp = kornia.warp_perspective(img_batch, M_matrices[i].unsqueeze(0).repeat(2, 1,1), dsize=(219, 306))
-            feature = self.net1(img_warp)
+            if self.BEV:   #perform BEV transform: M - (batch_size, 3, 3)
+                img_warp = kornia.warp_perspective(img_batch, M_matrices[i].unsqueeze(0).repeat(len(x), 1,1), dsize=(219, 306))
+                feature = self.net1(img_warp)
+            else:
+                feature = self.net1(img_batch)
             data.append(feature.unsqueeze(0))
         #multi-view max pool + classification
         return self.net2(data)

@@ -16,7 +16,8 @@ import numpy as np
 from helper import collate_fn, compute_ts_road_map
 from torchvision import transforms
 
-from model_lane import Multi_UNet
+#from model_lane import Multi_UNet
+from model_lane_multi import Multi_UNet #new full unet structure
 from data_loading import get_loaders
 import util
 
