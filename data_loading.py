@@ -2,13 +2,14 @@ import os
 import pickle
 
 import numpy as np
-from data_helper import UnlabeledDataset, LabeledDataset
+from data_helper import LabeledDataset,UnlabeledDataset
 from helper import collate_fn
 from torchvision import transforms
 import torch
 
 
-def get_loaders(data_type, image_folder = 'data', annotation_file = 'data/annotation.csv',
+def get_loaders(data_type, image_folder = '/Users/nhuang37/Desktop/NYU DS/Yr 2 Sem2/DL/Final project/DLSP20-Project/data', 
+            annotation_file = '/Users/nhuang37/Desktop/NYU DS/Yr 2 Sem2/DL/Final project/DLSP20-Project/data/annotation.csv',
                 split_folder = 'data_utils', batch_size = 4, extra_info=False):
     """
     Args:
@@ -72,18 +73,15 @@ def get_loaders(data_type, image_folder = 'data', annotation_file = 'data/annota
                                      (0.339, 0.340, 0.342))
                 ])
 
-        trainset = UnLabeledDataset(image_folder=image_folder,
-                                  annotation_file=annotation_file,
+        trainset = UnlabeledDataset(image_folder=image_folder,
+                                  first_dim='sample',
                                   scene_index=train_unlabeled_scene_index,
                                   transform=transform,
-                                  extra_info=extra_info
                                  )
-        valset = UnLabeledDataset(image_folder=image_folder,
-                          annotation_file=annotation_file,
+        valset = UnlabeledDataset(image_folder=image_folder,
+                          first_dim='sample',
                           scene_index=val_unlabeled_scene_index,
-                          transform=transform,
-                          extra_info=extra_info
-                         )
+                          transform=transform)
 
         trainloader = torch.utils.data.DataLoader(trainset,
                                           batch_size=batch_size,
@@ -100,3 +98,6 @@ def get_loaders(data_type, image_folder = 'data', annotation_file = 'data/annota
                                  )
 
     return trainloader, valloader
+
+train_loader, val_loader = get_loaders('unlabeled', batch_size = 4)
+
