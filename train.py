@@ -48,7 +48,7 @@ def main():
 
     model = Yolo(args.feature_size, args.num_bboxes, device).to(device)
     loss_fxn = Loss(args.feature_size, args.num_bboxes)
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
     if args.resume:
         if os.path.isfile(args.resume):
