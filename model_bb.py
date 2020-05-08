@@ -208,22 +208,22 @@ class Yo2o(nn.Module):
            [-8.30498864e-17, -7.61006318e-03,  1.00000000e+00]]
            ]).to(self.device)
 
-        resnet = models.resnet50(pretrained=False)
+        resnet = models.resnet34(pretrained=False)
         modules = list(resnet.children())[:-2]
         self.resnet = nn.Sequential(*modules)
 
         self.lin1 = nn.Sequential(
-            nn.Linear(54, 32),
+            nn.Linear(80, 64),
             nn.ReLU(),
             nn.Dropout(0.5, inplace=False))
 
         self.lin2  = nn.Sequential(
-            nn.Linear(2048*32, 16384),
+            nn.Linear(512*64, 8192),
             nn.ReLU(),
             nn.Dropout(0.5, inplace=False))
 
         self.classifier = nn.Sequential(
-            nn.Linear(16384, self.feature_size*self.feature_size*5*self.num_bboxes),
+            nn.Linear(8192, self.feature_size*self.feature_size*5*self.num_bboxes),
             nn.Sigmoid())
 
     def forward(self, images):

@@ -44,6 +44,7 @@ def get_parser():
 def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device('cpu')
     cudnn.benchmark = True
 
     args = get_parser().parse_args()
