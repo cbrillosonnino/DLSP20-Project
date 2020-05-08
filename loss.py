@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import shutil
+import os
 from helper import compute_ats_bounding_boxes
 
 class Loss(nn.Module):
@@ -74,7 +75,7 @@ class Loss(nn.Module):
             tensor_list.append(target_tensor)
         return torch.stack(tensor_list)
 
-    def decode(self, pred_tensor, conf_thresh = 0.5, decice = 'cuda'):
+    def decode(self, pred_tensor, conf_thresh = 0.5, device = 'cuda'):
         """decode single tensor into box coordinates"""
 
         boxes , confidences = [], []
@@ -140,7 +141,7 @@ class Loss(nn.Module):
             target = inputs[element]['bounding_box']
             predict = self.decode(predictions[element], conf_thresh = conf_thresh)
 
-            ats += compute_ats_bounding_boxes(target,predict)
+            ats += compute_ats_bounding_boxes(target.cpu(),predict.cpu())
 
         return ats
 
@@ -152,6 +153,9 @@ class Loss(nn.Module):
         :return:
         """
         # compute [x1,y1,x2,y2] w.r.t. top left and bottom right coordinates separately
+        
+        bbox1.cpu()
+        bbox2.cpu()
         b1x1y1 = bbox1[:,:2]-bbox1[:,2:]**2 # [N, (x1,y1)=2]
         b1x2y2 = bbox1[:,:2]+bbox1[:,2:]**2 # [N, (x2,y2)=2]
         b2x1y1 = bbox2[:,:2]-bbox2[:,2:]**2 # [M, (x1,y1)=2]
@@ -221,7 +225,7 @@ class Loss(nn.Module):
         for i in range(0,box_target.shape[0],self.num_bboxes):
             box1 = box_pred[i:i+self.num_bboxes].to(device)
             box2 = box_target[i:i+self.num_bboxes].to(device)
-            iou = self.compute_iou(box1[:, :4], box2[:, :4])
+            iou = self.compute_iou(box1[:, :4], box2[:, :4]).to(device)
             max_iou, max_index = iou.max(0)
             coord_response_mask[i+max_index[0]]=True
             coord_not_response_mask[i+max_index[0]]=False
