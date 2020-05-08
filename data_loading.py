@@ -98,4 +98,4 @@ def get_loaders(data_type, image_folder = 'data', annotation_file = 'data/annota
 
     return trainloader, valloader
 
-train_loader, val_loader = get_loaders('unlabeled', batch_size = 4)
+#train_loader, val_loader = get_loaders('unlabeled', batch_size = 4)
