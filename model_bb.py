@@ -208,8 +208,8 @@ class Yo2o(nn.Module):
            [-8.30498864e-17, -7.61006318e-03,  1.00000000e+00]]
            ]).to(self.device)
 
-        resnet = models.resnet34(pretrained=False)
-        modules = list(resnet.children())[:-2]
+        resnet = resnet50_encoderdecoder()
+        modules = list(resnet.children())[:8]
         self.resnet = nn.Sequential(*modules)
 
         self.lin1 = nn.Sequential(
@@ -218,7 +218,7 @@ class Yo2o(nn.Module):
             nn.Dropout(0.5, inplace=False))
 
         self.lin2  = nn.Sequential(
-            nn.Linear(512*32, 8192),
+            nn.Linear(2048*32, 8192),
             nn.ReLU(),
             nn.Dropout(0.5, inplace=False))
 
@@ -238,7 +238,7 @@ class Yo2o(nn.Module):
 
         agg = torch.cat(data, dim=0)
         agg = torch.max(agg,dim=0)[0]
-        agg = agg.view(agg.size(0), 512, -1)
+        agg = agg.view(agg.size(0), 2048, -1)
         agg = self.lin1(agg)
 
         boxes = agg.view(agg.size(0), -1)
