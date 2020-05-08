@@ -230,7 +230,7 @@ class Yo2o(nn.Module):
         batch_size = images.shape[0]
 
         data = []
-        for i in range(batch_size):
+        for i in range(6):
             img_warp = kornia.warp_perspective(images[:,i,:,:,:], self.M_matrices[i].unsqueeze(0).repeat(batch_size, 1,1), dsize=(204, 306))
             img_warp = kornia.center_crop(img_warp, (192,288))
             out = self.resnet(img_warp)
@@ -247,4 +247,3 @@ class Yo2o(nn.Module):
         boxes = boxes.view(-1, self.feature_size, self.feature_size, 5 * self.num_bboxes)
 
         return boxes
-        

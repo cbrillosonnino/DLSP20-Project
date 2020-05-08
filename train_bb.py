@@ -98,7 +98,7 @@ def main():
 
         model.eval()
         print('validating...')
-        ats = 0
+        val_ats = 0
         for i, (sample, target, road_image) in enumerate(valloader):
             with torch.no_grad():
                 img_batch = torch.stack(sample).to(device)
@@ -106,9 +106,9 @@ def main():
                 ats = loss_fxn.validate(output, target, conf_thresh = args.thresh)
                 val_ats += ats
 
-        print('Validation ATS = {}, Learning Rate = {}'.format(ats, learning_rate))
-        is_best = max_val_ats < ats
-        max_BLEU = max(ats, max_val_ats)
+        print('Validation ATS = {}, Learning Rate = {}'.format(val_ats, learning_rate))
+        is_best = max_val_ats < val_ats
+        max_val_ats = max(val_ats, max_val_ats)
 
 
         if epoch+1 % 10 == 0:
