@@ -116,7 +116,7 @@ def main():
             for param_group in optimizer.param_groups: param_group['lr'] = learning_rate
 
         file = open(f'{args.save}/resuts.txt','a')
-        file.write('{},{}\n'.format(train_losses.avg,ats))
+        file.write('{},{}\n'.format(train_loss.avg,ats))
         file.close()
 
         save_checkpoint({

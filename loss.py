@@ -74,7 +74,7 @@ class Loss(nn.Module):
             tensor_list.append(target_tensor)
         return torch.stack(tensor_list)
 
-    def decode(self, pred_tensor, conf_thresh = 0.5):
+    def decode(self, pred_tensor, conf_thresh = 0.5, decice = 'cuda'):
         """decode single tensor into box coordinates"""
 
         boxes , confidences = [], []
@@ -87,11 +87,11 @@ class Loss(nn.Module):
             for j in range(self.feature_size): # for y-dimension.
                 prob = estimates_boxes[j, i, 4]
                 if prob > conf_thresh:
-                    box = pred_tensor[j, i, :4]
-                    x0y0_normalized = torch.FloatTensor([i, j]) * cell_size
+                    box = pred_tensor[j, i, :4].to(device)
+                    x0y0_normalized = torch.FloatTensor([i, j]).to(device) * cell_size
                     xy_normalized = box[:2] * cell_size + x0y0_normalized
                     wh_normalized = box[2:]
-                    box_xyxy = torch.FloatTensor(2,4)
+                    box_xyxy = torch.FloatTensor(2,4).to(device)
                     box_xyxy[:,0] = xy_normalized - 0.5 * wh_normalized
                     box_xyxy[:,3] = xy_normalized + 0.5 * wh_normalized
                     box_xyxy[0,1] = box_xyxy[0,0]
@@ -106,11 +106,11 @@ class Loss(nn.Module):
             for j in range(self.feature_size): # for y-dimension.
                 prob = estimates_boxes[j, i, 4]
                 if prob > conf_thresh:
-                    box = pred_tensor[j, i, :4]
-                    x0y0_normalized = torch.FloatTensor([i, j]) * cell_size
+                    box = pred_tensor[j, i, :4].to(device)
+                    x0y0_normalized = torch.FloatTensor([i, j]).to(device) * cell_size
                     xy_normalized = box[:2] * cell_size + x0y0_normalized
                     wh_normalized = box[2:]
-                    box_xyxy = torch.FloatTensor(2,4)
+                    box_xyxy = torch.FloatTensor(2,4).to(device)
                     box_xyxy[:,0] = xy_normalized - 0.5 * wh_normalized
                     box_xyxy[:,3] = xy_normalized + 0.5 * wh_normalized
                     box_xyxy[0,1] = box_xyxy[0,0]
