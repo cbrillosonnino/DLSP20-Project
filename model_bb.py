@@ -5,6 +5,8 @@ import kornia
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torchvision import models
+from models import resnet50_encoderdecoder
+from models import resnet34
 
 class DarkNet(nn.Module):
     def __init__(self, device):
@@ -208,8 +210,8 @@ class Yo2o(nn.Module):
            [-8.30498864e-17, -7.61006318e-03,  1.00000000e+00]]
            ]).to(self.device)
 
-        resnet = resnet50_encoderdecoder()
-        modules = list(resnet.children())[:8]
+        resnet = resnet34()
+        modules = list(resnet.children())[:-2]
         self.resnet = nn.Sequential(*modules)
 
         self.lin1 = nn.Sequential(
