@@ -101,6 +101,7 @@ def main():
         ats = 0
         for i, (sample, target, road_image) in enumerate(valloader):
             with torch.no_grad():
+                img_batch = torch.stack(sample).to(device)
                 output = model(img_batch)
                 ats = loss_fxn.validate(output, target, conf_thresh = args.thresh)
                 val_ats += ats
