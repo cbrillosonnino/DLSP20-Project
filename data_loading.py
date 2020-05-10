@@ -8,8 +8,12 @@ from torchvision import transforms
 import torch
 
 
+<<<<<<< HEAD
 def get_loaders(data_type, image_folder = 'data', 
             annotation_file = 'data/annotation.csv',
+=======
+def get_loaders(data_type, image_folder = 'data', annotation_file = 'data/annotation.csv',
+>>>>>>> b0f8051fd8ff96724ca0891772363d8f3a6641fa
                 split_folder = 'data_utils', batch_size = 4, extra_info=False):
     """
     Args:
@@ -97,4 +101,8 @@ def get_loaders(data_type, image_folder = 'data',
 
     return trainloader, valloader
 
+<<<<<<< HEAD
 
+=======
+#train_loader, val_loader = get_loaders('unlabeled', batch_size = 4)
+>>>>>>> b0f8051fd8ff96724ca0891772363d8f3a6641fa

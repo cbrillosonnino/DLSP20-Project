@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 
-#from shapely.geometry import Polygon
+from shapely.geometry import Polygon
 
 def convert_map_to_lane_map(ego_map, binary_lane):
     mask = (ego_map[0,:,:] == ego_map[1,:,:]) * (ego_map[1,:,:] == ego_map[2,:,:]) + (ego_map[0,:,:] == 250 / 255)
