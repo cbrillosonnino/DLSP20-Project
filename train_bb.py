@@ -83,7 +83,6 @@ def main():
         train_loss.reset()
 
         for i, (sample, target, road_image) in enumerate(trainloader):
-            break
             if i%100 ==  0:
                 print('[{}/{}] {}'.format(i,len(trainloader), train_loss.avg))
             batch_size = len(sample)
@@ -100,13 +99,13 @@ def main():
         print('validating...')
         val_ats = 0
         for i, (sample, target, road_image) in enumerate(valloader):
-            break
             with torch.no_grad():
                 img_batch = torch.stack(sample).to(device)
                 output = model(img_batch)
                 ats = loss_fxn.validate(output, target, conf_thresh = args.thresh)
                 val_ats += ats
 
+        val_ats /= 378
         print('Validation ATS = {}, Learning Rate = {}'.format(val_ats, learning_rate))
         is_best = max_val_ats < val_ats
         max_val_ats = max(val_ats, max_val_ats)
@@ -117,8 +116,8 @@ def main():
                 param_group['lr'] = learning_rate
         print(learning_rate)
 
-        file = open(f'{args.save}/resuts.txt','a')
-        file.write('{},{}\n'.format(train_loss.avg,ats))
+        file = open(f'{args.save}/results.txt','a')
+        file.write('{},{}\n'.format(train_loss.avg,val_ats))
         file.close()
 
         save_checkpoint({
