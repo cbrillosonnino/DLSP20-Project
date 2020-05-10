@@ -4,9 +4,9 @@ import torch.backends.cudnn as cudnn
 import kornia
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torchvision import models
-from models import resnet50_encoderdecoder
+import torchvision
 from models import resnet34
+from models import resnet34_encoderdecoder
 
 class DarkNet(nn.Module):
     def __init__(self, device):
