@@ -42,12 +42,6 @@ class Loss(nn.Module):
             boxes_wh = torch.stack((boxes_max_x-boxes_min_x, boxes_max_y-boxes_min_y), 1)
             boxes_xy = torch.stack(((boxes_max_x+boxes_min_x), (boxes_max_y+boxes_min_y)), 1)/2
 
-
-#             boxes = torch.stack((boxes_min_x, boxes_min_y, boxes_max_x, boxes_max_y), 1)
-
-#             boxes_wh = boxes[:, 2:] - boxes[:, :2] # width and height for each box, [n, 2]
-#             boxes_xy = (boxes[:, 2:] + boxes[:, :2]) / 2.0 # center x & y for each box, [n, 2]
-
             for b in range(boxes.size(0)):
                 xy, wh = boxes_xy[b], boxes_wh[b]
 
@@ -146,14 +140,8 @@ class Loss(nn.Module):
         return ats
 
     def compute_iou(self, bbox1, bbox2):
-        """
-        Compute the intersection over union of two set of boxes, each box is [x1,y1,w,h]
-        :param bbox1: (tensor) bounding boxes, size [N,4]
-        :param bbox2: (tensor) bounding boxes, size [M,4]
-        :return:
-        """
-        # compute [x1,y1,x2,y2] w.r.t. top left and bottom right coordinates separately
-        
+        """compute IOU without mapping to output space"""
+
         bbox1.cpu()
         bbox2.cpu()
         b1x1y1 = bbox1[:,:2]-bbox1[:,2:]**2 # [N, (x1,y1)=2]
@@ -272,4 +260,5 @@ class AverageMeter(object):
 def save_checkpoint(state, is_best, save, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, f'{save}/model_best.pth.tar')
+        #shutil.copyfile(filename, f'{save}/model_best.pth.tar')
+        print('New Best!')

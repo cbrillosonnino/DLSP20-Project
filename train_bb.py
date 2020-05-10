@@ -57,7 +57,6 @@ def main():
 
     model = Yo2o(args.feature_size, args.num_bboxes, device).to(device)
     loss_fxn = Loss(args.feature_size, args.num_bboxes, args.lambda_coord, args.lambda_noobj)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     if args.resume:
@@ -65,7 +64,7 @@ def main():
             checkpoint = torch.load(args.resume)
             start_epoch = checkpoint['epoch']
             max_val_ats= checkpoint['max_val_ats']
-            emodel.load_state_dict(checkpoint['model'])
+            model.load_state_dict(checkpoint['model'])
             optimizer.load_state_dict(checkpoint['optimizer'])
         else: print("No checkpoint found at '{}'".format(args.resume))
 
@@ -84,6 +83,7 @@ def main():
         train_loss.reset()
 
         for i, (sample, target, road_image) in enumerate(trainloader):
+            break
             if i%100 ==  0:
                 print('[{}/{}] {}'.format(i,len(trainloader), train_loss.avg))
             batch_size = len(sample)
@@ -100,6 +100,7 @@ def main():
         print('validating...')
         val_ats = 0
         for i, (sample, target, road_image) in enumerate(valloader):
+            break
             with torch.no_grad():
                 img_batch = torch.stack(sample).to(device)
                 output = model(img_batch)
@@ -110,10 +111,11 @@ def main():
         is_best = max_val_ats < val_ats
         max_val_ats = max(val_ats, max_val_ats)
 
-
-        if epoch+1 % 10 == 0:
+        if (epoch+1) % 5 == 0:
             learning_rate /= 10
-            for param_group in optimizer.param_groups: param_group['lr'] = learning_rate
+            for param_group in optimizer.param_groups:
+                param_group['lr'] = learning_rate
+        print(learning_rate)
 
         file = open(f'{args.save}/resuts.txt','a')
         file.write('{},{}\n'.format(train_loss.avg,ats))

@@ -220,7 +220,7 @@ class Yo2o(nn.Module):
             nn.Dropout(0.5, inplace=False))
 
         self.lin2  = nn.Sequential(
-            nn.Linear(2048*32, 8192),
+            nn.Linear(512*32, 8192),
             nn.ReLU(),
             nn.Dropout(0.5, inplace=False))
 
@@ -240,7 +240,7 @@ class Yo2o(nn.Module):
 
         agg = torch.cat(data, dim=0)
         agg = torch.max(agg,dim=0)[0]
-        agg = agg.view(agg.size(0), 2048, -1)
+        agg = agg.view(agg.size(0), 512, -1)
         agg = self.lin1(agg)
 
         boxes = agg.view(agg.size(0), -1)
