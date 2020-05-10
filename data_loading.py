@@ -8,8 +8,8 @@ from torchvision import transforms
 import torch
 
 
-def get_loaders(data_type, image_folder = '/Users/nhuang37/Desktop/NYU DS/Yr 2 Sem2/DL/Final project/DLSP20-Project/data', 
-            annotation_file = '/Users/nhuang37/Desktop/NYU DS/Yr 2 Sem2/DL/Final project/DLSP20-Project/data/annotation.csv',
+def get_loaders(data_type, image_folder = 'data', 
+            annotation_file = 'data/annotation.csv',
                 split_folder = 'data_utils', batch_size = 4, extra_info=False):
     """
     Args:
@@ -86,18 +86,15 @@ def get_loaders(data_type, image_folder = '/Users/nhuang37/Desktop/NYU DS/Yr 2 S
         trainloader = torch.utils.data.DataLoader(trainset,
                                           batch_size=batch_size,
                                           shuffle=True,
-                                          num_workers=2,
-                                          collate_fn=collate_fn
+                                          num_workers=2
                                          )
 
         valloader = torch.utils.data.DataLoader(valset,
                                   batch_size=batch_size,
                                   shuffle=False,
-                                  num_workers=2,
-                                  collate_fn=collate_fn
+                                  num_workers=2
                                  )
 
     return trainloader, valloader
 
-train_loader, val_loader = get_loaders('unlabeled', batch_size = 4)
 
