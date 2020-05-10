@@ -176,7 +176,7 @@ class Yolo(nn.Module):
 
 
 class Yo2o(nn.Module):
-    def __init__(self, feature_size = 20, num_bboxes = 2, device = 'cuda'):
+    def __init__(self, feature_size = 20, num_bboxes = 2, device = 'cuda', load_pretrained = False):
         super().__init__()
 
         self.feature_size = feature_size
@@ -210,9 +210,14 @@ class Yo2o(nn.Module):
            [-8.30498864e-17, -7.61006318e-03,  1.00000000e+00]]
            ]).to(self.device)
 
-        resnet = resnet34_encoderdecoder()
-        modules = list(resnet.children())[:8]
-        self.resnet = nn.Sequential(*modules)
+        if load_pretrained:
+            resnet = torch.load('../self-sup/resnet34_pretrain')
+            modules = list(resnet.children())[:8]
+            self.resnet = nn.Sequential(*modules)
+        else:
+            resnet = resnet34_encoderdecoder()
+            modules = list(resnet.children())[:8]
+            self.resnet = nn.Sequential(*modules)
 
         self.lin1 = nn.Sequential(
             nn.Linear(54, 32),
