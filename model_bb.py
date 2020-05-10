@@ -210,8 +210,8 @@ class Yo2o(nn.Module):
            [-8.30498864e-17, -7.61006318e-03,  1.00000000e+00]]
            ]).to(self.device)
 
-        resnet = resnet34()
-        modules = list(resnet.children())[:-2]
+        resnet = resnet34_encoderdecoder()
+        modules = list(resnet.children())[:8]
         self.resnet = nn.Sequential(*modules)
 
         self.lin1 = nn.Sequential(

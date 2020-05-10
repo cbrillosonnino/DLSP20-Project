@@ -181,7 +181,7 @@ class ResNet_EncoderDecoder_wbottleneck(nn.Module):
         self.deconv5 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1, bias=False)
         self.bn_d5 = nn.BatchNorm2d(32)
         ### output size: 64x256x256; apply regressor
-        self.classifier = nn.Conv2d(32, 3, kernel_size=3, padding=1, bias=True)  
+        self.classifier = nn.Conv2d(32, 3, kernel_size=3, padding=1, bias=True)
         self.tanh = nn.Tanh()
         self.sigmoid = nn.Sigmoid()
 
@@ -222,7 +222,7 @@ class ResNet_EncoderDecoder_wbottleneck(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        
+
         return x
 
     def decode(self, x):
@@ -234,26 +234,26 @@ class ResNet_EncoderDecoder_wbottleneck(nn.Module):
         x = self.deconv1(x)
         x = self.bn_d1(x)
         x = self.relu(x)
-        
+
         x = self.deconv2(x)
         x = self.bn_d2(x)
         x = self.relu(x)
-        
+
         x = self.deconv3(x)
         x = self.bn_d3(x)
         x = self.relu(x)
-        
+
         x = self.deconv4(x)
         x = self.bn_d4(x)
         x = self.relu(x)
-        
+
         x = self.deconv5(x)
         x = self.bn_d5(x)
         x = self.relu(x)
-        
+
         x = self.classifier(x)
         x = self.tanh(x)
-        
+
         return x
 
     def forward(self, x):
@@ -291,7 +291,7 @@ class ResNet_EncoderDecoder(nn.Module):
         self.deconv5 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1, bias=False)
         self.bn_d5 = nn.BatchNorm2d(32)
         ### output size: 64x256x256; apply regressor
-        self.classifier = nn.Conv2d(32, 3, kernel_size=3, padding=1, bias=True)  
+        self.classifier = nn.Conv2d(32, 3, kernel_size=3, padding=1, bias=True)
         self.tanh = nn.Tanh()
 
         for m in self.modules():
@@ -332,7 +332,7 @@ class ResNet_EncoderDecoder(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        
+
         return x
 
     def decode(self, x):
@@ -340,26 +340,26 @@ class ResNet_EncoderDecoder(nn.Module):
         x = self.deconv1(x)
         x = self.bn_d1(x)
         x = self.relu(x)
-        
+
         x = self.deconv2(x)
         x = self.bn_d2(x)
         x = self.relu(x)
-        
+
         x = self.deconv3(x)
         x = self.bn_d3(x)
         x = self.relu(x)
-        
+
         x = self.deconv4(x)
         x = self.bn_d4(x)
         x = self.relu(x)
-        
+
         x = self.deconv5(x)
         x = self.bn_d5(x)
         x = self.relu(x)
-        
+
         x = self.classifier(x)
         x = self.tanh(x)
-        
+
         return x
 
     def forward(self, x):
@@ -373,14 +373,14 @@ def crop(variable,tr,tc):
     r1 = int(round((r - tr) / 2.))
     c1 = int(round((c - tc) / 2.))
     return variable[:,:, r1:r1+tr,c1:c1+tc]
-    
+
 class FCNify(nn.Module):
-    def __init__(self, original_model, n_class=21, 
+    def __init__(self, original_model, n_class=21,
         layers_to_remove=['avgpool', 'fc7', 'bn7', 'relu7', 'fc8']):
         super(FCNify, self).__init__()
-        for layers_ in layers_to_remove:        
+        for layers_ in layers_to_remove:
             del(original_model._modules[layers_])
-        
+
         self.features = copy.deepcopy(original_model)
 
         self.score_layer2 = nn.Conv2d(512/4, n_class, 1)
@@ -400,7 +400,7 @@ class FCNify(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-            
+
     def forward(self, x):
 
         x = self.features.conv1(x)
@@ -421,7 +421,7 @@ class FCNify(nn.Module):
         layer4_scores = layer4_scores[:, :, :layer2_scores.size()[2], :layer2_scores.size()[3]]
 
         score = layer2_scores + layer3_scores + layer4_scores
-        
+
 
         return self.upsample8(score)
 
@@ -431,9 +431,9 @@ class FCNify_v2(nn.Module):
         super(FCNify_v2, self).__init__()
         torch.cuda.manual_seed(7)
         torch.manual_seed(7)
-        for layers_ in layers_to_remove:        
+        for layers_ in layers_to_remove:
             del(original_model._modules[layers_])
-                
+
         self.features = copy.deepcopy(original_model)
         self.relu = nn.ReLU(inplace=True)
         self.d1 = nn.Conv2d(512, n_class, 1)
@@ -441,7 +441,7 @@ class FCNify_v2(nn.Module):
         self.d3 = nn.Conv2d(128, n_class, 1)
         self.d4 = nn.Conv2d(64, n_class, 1)
         self.d5 = nn.Conv2d(32, n_class, 1)
-        
+
         self.upsample2 = bilinear(scale_factor = 2)
         self.upsample4 = bilinear(scale_factor = 4)
         self.upsample8 = bilinear(scale_factor = 8)
@@ -459,11 +459,11 @@ class FCNify_v2(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-            
+
     def forward(self, x):
         rows = x.size()[2]
         cols = x.size()[3]
-        
+
         x = self.features.conv1(x)
         x = self.features.bn1(x)
         x = self.features.relu(x)
@@ -509,8 +509,8 @@ class Resnet_coach_vae(nn.Module):
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
 
 
-        self.mu = nn.Conv2d(512, 100, kernel_size=1, bias=True)  
-        self.std = nn.Conv2d(512, 100, kernel_size=1, bias=True)  
+        self.mu = nn.Conv2d(512, 100, kernel_size=1, bias=True)
+        self.std = nn.Conv2d(512, 100, kernel_size=1, bias=True)
 
         self.pred = nn.Conv2d(100, 1, kernel_size=1, bias=True)
 
@@ -565,10 +565,10 @@ class Resnet_coach_vae(nn.Module):
 
         z = self.reparameterize(mu, logvar)
         d = self.pred(z)
-        
+
         return d, mu, logvar
 
-        
+
     def forward(self, x, alpha = 1, use_coach = True):
         features = None
         mu = None
@@ -577,8 +577,8 @@ class Resnet_coach_vae(nn.Module):
             size_ = x.size()
             features = Variable(torch.rand(size_[0], 1, int(size_[2]/16), int(size_[3]/16) ).cuda())
         else:
-            features, mu, logvar = self.get_feature(x) 
-        
+            features, mu, logvar = self.get_feature(x)
+
         size_ = features.size()
         features = features.view(size_[0], size_[1], size_[2]*size_[3])
         p,_ = features.topk(k = int(size_[2]*size_[3]*self.drop_ratio), dim = 2)
@@ -601,14 +601,14 @@ def resnet50_encoderdecoder(**kwargs):
     """Constructs a ResNet-50 encoder + decoder model.
     """
     model = ResNet_EncoderDecoder(Bottleneck, [3, 4, 6, 3], **kwargs)
-    
+
     return model
 
 def resnet18_encoderdecoder(**kwargs):
     """Constructs a ResNet-50 encoder + decoder model.
     """
     model = ResNet_EncoderDecoder(BasicBlock, [2, 2, 2, 2], **kwargs)
-    
+
     return model
 
 
@@ -616,7 +616,7 @@ def resnet18_encoderdecoder_wbottleneck(**kwargs):
     """Constructs a ResNet-50 encoder + decoder model.
     """
     model = ResNet_EncoderDecoder_wbottleneck(BasicBlock, [2, 2, 2, 2], **kwargs)
-    
+
     return model
 
 
@@ -624,7 +624,7 @@ def resnet18_coach_vae(**kwargs):
     """Constructs a ResNet-50 encoder + decoder model.
     """
     model = Resnet_coach_vae(BasicBlock, [2, 2, 2, 2], **kwargs)
-    
+
     return model
 
 
@@ -686,4 +686,10 @@ def resnet152(pretrained=False, **kwargs):
     model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
+    return model
+
+def resnet34_encoderdecoder(**kwargs):
+    """Constructs a ResNet-34 encoder + decoder model.
+    """
+    model = ResNet_EncoderDecoder(BasicBlock, [3, 4, 6, 3], **kwargs)
     return model
