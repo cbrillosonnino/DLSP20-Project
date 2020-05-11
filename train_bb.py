@@ -114,7 +114,6 @@ def main():
             learning_rate /= 10
             for param_group in optimizer.param_groups:
                 param_group['lr'] = learning_rate
-        print(learning_rate)
 
         file = open(f'{args.save}/results.txt','a')
         file.write('{},{}\n'.format(train_loss.avg,val_ats))

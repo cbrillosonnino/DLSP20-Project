@@ -9,7 +9,7 @@ from models import resnet34
 from models import resnet34_encoderdecoder
 
 class DarkNet(nn.Module):
-    def __init__(self, device):
+    def __init__(self):
         super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(3, 64, 5, padding=2),
@@ -96,8 +96,10 @@ class DarkNet(nn.Module):
 
         return out
 
-class Yolo(nn.Module):
-    def __init__(self, feature_size, num_bboxes, device):
+
+class Yo1o(nn.Module):
+    '''DarkNet Backbone'''
+    def __init__(self, feature_size = 20, num_bboxes = 2, device = 'cuda'):
         super().__init__()
 
         self.M_matrices = torch.tensor([
@@ -133,49 +135,46 @@ class Yolo(nn.Module):
         self.num_bboxes = num_bboxes
 
         self.darknet = DarkNet()
-        self.conv = nn.Sequential(
-            nn.Conv2d(1024, 1024, 3, padding=1),
-            nn.BatchNorm2d(1024),
-            nn.LeakyReLU(0.1, inplace=True),
-            nn.Conv2d(1024, 1024, 3, stride=2, padding=1),
-            nn.BatchNorm2d(1024),
-            nn.LeakyReLU(0.1),
-        )
-        self.pool1 = nn.MaxPool1d(54)
+
         self.lin1 = nn.Sequential(
-            nn.Linear(6 * 1024, 4096),
-            nn.LeakyReLU(0.1, inplace=True),
-            nn.Dropout(0.5, inplace=False)
-        )
-        self.lin2 = nn.Sequential(
-            nn.Linear(4096, self.feature_size*self.feature_size*5*self.num_bboxes),
-            nn.Sigmoid()
-        )
+            nn.Linear(216, 32),
+            nn.ReLU(),
+            nn.Dropout(0.5, inplace=False))
+
+        self.lin2  = nn.Sequential(
+            nn.Linear(1024*32, 8192),
+            nn.ReLU(),
+            nn.Dropout(0.5, inplace=False))
+
+        self.classifier = nn.Sequential(
+            nn.Linear(8192, self.feature_size*self.feature_size*5*self.num_bboxes),
+            nn.Sigmoid())
 
     def forward(self, images):
-        data = []
-
         batch_size = images.shape[0]
 
+        data = []
         for i in range(6):
             img_warp = kornia.warp_perspective(images[:,i,:,:,:], self.M_matrices[i].unsqueeze(0).repeat(batch_size, 1,1), dsize=(204, 306))
             img_warp = kornia.center_crop(img_warp, (192,288))
             out = self.darknet(img_warp)
-            out = self.conv(out)
-            out = out.view(batch_size,1024,-1)
-            out = self.pool1(out).squeeze(-1)
-            data.append(out.unsqueeze(1))
-        data = torch.cat(data, dim=1)
+            data.append(out.unsqueeze(0))
 
-        data = data.view(out.size(0), -1)
-        data = self.lin1(data)
-        data = self.lin2(data)
-        data = data.view(-1, self.feature_size, self.feature_size, 5 * self.num_bboxes)
+        agg = torch.cat(data, dim=0)
+        agg = torch.max(agg,dim=0)[0]
+        agg = agg.view(agg.size(0), 1024, -1)
+        agg = self.lin1(agg)
 
-        return data
+        boxes = agg.view(agg.size(0), -1)
+        boxes = self.lin2(boxes)
+        boxes = self.classifier(boxes)
+        boxes = boxes.view(-1, self.feature_size, self.feature_size, 5 * self.num_bboxes)
+
+        return boxes
 
 
 class Yo2o(nn.Module):
+    '''ResNet Backbone'''
     def __init__(self, feature_size = 20, num_bboxes = 2, device = 'cuda', load_pretrained = False):
         super().__init__()
 
