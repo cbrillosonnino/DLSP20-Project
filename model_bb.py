@@ -207,12 +207,12 @@ class Yo3o(nn.Module):
         self.darknet = DarkNet()
 
         self.lin1 = nn.Sequential(
-            nn.Linear(216, 64),
+            nn.Linear(216, 16),
             nn.ReLU(),
             nn.Dropout(0.5, inplace=False))
 
         self.lin2  = nn.Sequential(
-            nn.Linear(65536, 8192),
+            nn.Linear(16384, 8192),
             nn.ReLU(),
             nn.Dropout(0.5, inplace=False))
 
