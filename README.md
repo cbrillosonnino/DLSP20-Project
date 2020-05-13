@@ -12,7 +12,7 @@
 - For bounding box predictions and YOLO loss function, see ```loss_bboxes.py```
 
 ### Training Notebooks:
-1. Road Map: ```Stitched_Resnet_Enc_Dec.ipynb```
+1. Road Map: ```Roadmap_Train_ResNet_Enc_Dec.ipynb```
 2. Bounding Box ```train_bboxes.py``` & ```fine_tune_bboxes.py```
 3. Pretext: ```pretext_image_semantic_inpainting.ipynb```
 
