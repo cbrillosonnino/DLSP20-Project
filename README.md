@@ -17,7 +17,7 @@
 3. Pretext: ```pretext_image_semantic_inpainting.ipynb```
 
 ### Other folders:
-- data exploration: initial data analysis and Bird's Eye View projection experiments
+- data_exploration: initial data analysis and Bird's Eye View projection experiments
 - data_utils: for train/validation data split
 
 All our saved model files can be found in shared drive: https://drive.google.com/open?id=1yPUaMaL6IsPqmSGBrziksFYXL0sKkopL
