@@ -20,4 +20,5 @@
 - data_exploration: initial data analysis and Bird's Eye View projection experiments
 - data_utils: for train/validation data split
 
-All our saved model files can be found in shared drive: https://drive.google.com/open?id=1yPUaMaL6IsPqmSGBrziksFYXL0sKkopL
+Our best model files are in: https://drive.google.com/open?id=1yPUaMaL6IsPqmSGBrziksFYXL0sKkopL
+Our final round submission files are in: https://drive.google.com/open?id=1Dcau5I6y6aJoIi5ZD7_0nuqvBhxzrCz_
