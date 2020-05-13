@@ -18,7 +18,7 @@
 
 ### Other folders:
 - data_exploration: initial data analysis and Bird's Eye View projection experiments
-- data_utils: for train/validation data split
+- data_utils: for train/validation data split and sample statistics
 
 Our best model files are in: https://drive.google.com/open?id=1yPUaMaL6IsPqmSGBrziksFYXL0sKkopL
 
