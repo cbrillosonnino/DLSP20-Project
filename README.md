@@ -1,9 +1,21 @@
 # DLSP20-Project
 
-### Organization Folders:
-1. Old
-2. Exploratory Data Analysis (IPM, BEV)
-3. Competition Submission
-4. Final Stitched BEV Model
-- Train Stitched ResNet: see Stitched_Resnet_Enc_Dec.ipynb
-- Train Stitched YOLO: ```!python train_bb.py -lr 0.0001 ```
+### Our Models:
+1. Road Map
+- Baseline Unet (leaderboard round 2 submission): ```from model_lane_unet import Multi_UNet```
+- ResNet-Encoder-Decoder for 6 BEV views (learderboard round 3 submission): ```from model_lane import Multi_Classfier```
+- ResNet-Encoder-Decoder for stitched BEV (final report best model): ```from model_lane_res_stitch import Stitch_Classfier```
+
+2. Bounding Box
+- Yo2o (leaderboard round 3 submission): ```from model_bb_stitch import Yo2o``` 
+- Stitched Yo4o (final report best model): ```from model_bb_stitch import Yo4o_stitch``` 
+
+### Training Notebooks:
+1. Road Map: ```Stitched_Resnet_Enc_Dec.ipynb```
+2. Bounding Box
+3. Pretext: ```pretext_image_semantic_inpainting.ipynb```
+
+### Other folders:
+
+
+All our saved model files can be found in shared drive: https://drive.google.com/open?id=1yPUaMaL6IsPqmSGBrziksFYXL0sKkopL
