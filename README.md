@@ -9,6 +9,7 @@
 2. Bounding Box
 - Yo2o (leaderboard round 3 submission): ```from model_bb_stitch import Yo2o``` 
 - Stitched Yo4o (final report best model): ```from model_bb_stitch import Yo4o_stitch``` 
+- For bounding box predictions, also see ```loss.py```
 
 ### Training Notebooks:
 1. Road Map: ```Stitched_Resnet_Enc_Dec.ipynb```
@@ -16,6 +17,7 @@
 3. Pretext: ```pretext_image_semantic_inpainting.ipynb```
 
 ### Other folders:
-
+- data exploration: initial data analysis and Bird's Eye View projection experiments
+- data_utils: for train/validation data split
 
 All our saved model files can be found in shared drive: https://drive.google.com/open?id=1yPUaMaL6IsPqmSGBrziksFYXL0sKkopL
