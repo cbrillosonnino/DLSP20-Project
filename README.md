@@ -7,13 +7,13 @@
 - ResNet-Encoder-Decoder for stitched BEV (final report best model): ```from model_lane_res_stitch import Stitch_Classfier```
 
 2. Bounding Box
-- Yo2o (leaderboard round 3 submission): ```from model_bb_stitch import Yo2o``` 
+- Yo2o (leaderboard round 3 submission): ```from model_bboxes import Yo2o``` 
 - Stitched Yo4o (final report best model): ```from model_bb_stitch import Yo4o_stitch``` 
-- For bounding box predictions, also see ```loss.py```
+- For bounding box predictions and YOLO loss function, see ```loss_bboxes.py```
 
 ### Training Notebooks:
 1. Road Map: ```Stitched_Resnet_Enc_Dec.ipynb```
-2. Bounding Box
+2. Bounding Box ```train_bboxes.py``` & ```fine_tune_bboxes.py```
 3. Pretext: ```pretext_image_semantic_inpainting.ipynb```
 
 ### Other folders:
