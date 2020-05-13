@@ -11,8 +11,8 @@ import torch.backends.cudnn as cudnn
 import kornia
 
 from data_loading import get_loaders
-from loss import Loss, AverageMeter, save_checkpoint
-from model_bb import Yo2o
+from loss_bboxes import Loss, AverageMeter, save_checkpoint
+from model_bb import Yo1o, Yo2o, Yo3o, Yo4o
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Flickr30k Training')
